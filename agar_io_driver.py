@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -47,7 +51,7 @@ class AgarIODriver(object):
         self.play_button = self.driver.find_element_by_class_name(self.PLAY_BUTTON_CLASS)
         self.continue_button = self.driver.find_element_by_id(self.CONTINUE_BUTTON_ID)
 
-        print "%s x %s" % (self.canvas_width, self.canvas_height)
+        print("%s x %s" % (self.canvas_width, self.canvas_height))
 
     def get_score(self):
         return self.driver.execute_script(self.GET_SCORE_JAVASCRIPT)
@@ -65,12 +69,9 @@ class AgarIODriver(object):
         self.start_new_game()
         while True:
             loop_start = time.time()
-
-            pixelJson = self.get_canvas_pixels()
-            #pixels = json.loads(pixelJson)
-            score = self.get_score()
-            game_over = self.is_game_over()
-            print "Score %s, Game over: %s" % (score, game_over)
+            score, pixels, game_over = self._get_game_state()
+            loop_duration = time.time() - loop_start
+            print("Score %s, Game over: %s (Duration: %f)" % (score, game_over, loop_duration))
 
             if game_over:
                 ActionChains(self.driver).click(self.continue_button).perform()
@@ -81,8 +82,12 @@ class AgarIODriver(object):
             ActionChains(self.driver).move_to_element_with_offset(self.canvas_element, x_offset,
                                             y_offset).perform()
             
-            loop_duration = time.time() - loop_start
-            print loop_duration
+    def _get_game_state(self):
+        pixelJson = self.get_canvas_pixels()
+        pixels = json.loads(pixelJson)
+        score = self.get_score()
+        game_over = self.is_game_over()
+        return score, pixels, game_over
 
     @classmethod
     def _get_chrome_webdriver(cls):
@@ -103,6 +108,7 @@ class AgarIODriver(object):
         })
         return webdriver.Firefox(proxy=proxy)
 
-agar = AgarIODriver()
-while True:
-    agar.play_game()
+if __name__ == "__main__":
+    agar = AgarIODriver()
+    while True:
+        agar.play_game()
