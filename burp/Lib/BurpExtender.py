@@ -1,4 +1,20 @@
+'''
+This extension disables interception from the Proxy and automatically injects a bit of
+Javascript and HTML into all HTTP responses passing through Burp.
+
+We add a `<div id="score"></div>` element to the end of the body of all HTTP responses.
+
+We also add an extra line of Javascript to the Agar.io client code to write the current
+score to that div on every iteration of the game loop.
+
+Note: The Agar.io client code is obfuscated/minified. When the site updates, the variable
+and function names will change. See README.md for the steps to update this script.
+'''
 from burp import IBurpExtender, IProxyListener
+
+# Eg: `P = Math.max(P, Db());
+PREVIOUS_SCORE_VARIABLE_NAME = 'P'
+GET_CURRENT_SCORE_FUNCTION_NAME = 'Db'
 
 class BurpExtender(IBurpExtender):
 
@@ -40,8 +56,11 @@ class ProxyListener(IProxyListener):
         return
 
     def _editAgarHtml(self, html):
-        targetScoreString = 'P=Math.max(P,Db());'
-        scoreStringAddition = 'document.getElementById("score").innerHTML=Db();'
+        targetScoreString = '%s=Math.max(%s,%s());' % (
+            PREVIOUS_SCORE_VARIABLE_NAME, PREVIOUS_SCORE_VARIABLE_NAME,
+            GET_CURRENT_SCORE_FUNCTION_NAME)
+        scoreStringAddition = 'document.getElementById("score").innerHTML=%s();' % (
+            GET_CURRENT_SCORE_FUNCTION_NAME)
         newScoreString = targetScoreString + scoreStringAddition
         html = html.replace(targetScoreString, newScoreString)
 
