@@ -1,1 +1,2 @@
-java -Xmx512m -classpath burpsuite_v1.3.03.jar:burppython.jar burp.StartBurp
+#!/usr/bin/env bash
+java -Xmx512m -classpath burpsuite_free_v1.6.30.jar:burppython.jar burp.StartBurp

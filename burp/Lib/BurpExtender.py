@@ -1,29 +1,29 @@
-from burp import IBurpExtender
-
-from burp import IProxyListener
+from burp import IBurpExtender, IProxyListener
 
 class BurpExtender(IBurpExtender):
 
     def registerExtenderCallbacks(self, callbacks):
-
-        print "Hello!"
-
-        self._callbacks = callbacks
-
-        self._helpers = callbacks.getHelpers()
-
+        print "AgarIO Extension loaded. Waiting for HTTP traffic..."
+        helpers = callbacks.getHelpers()
         callbacks.setExtensionName("AgarIO Extension")
 
-        callbacks.registerProxyListener(ProxyListener(self._helpers))
+        # Disable interception from the Proxy. This stops Burp from freezing
+        # all HTTP traffic that passes through it and waiting for the user
+        # to click "forward." This plugin will still receive all HTTP messages
+        # before they're automatically forwarded.
+        callbacks.setProxyInterceptionEnabled(False)
+
+        callbacks.registerProxyListener(ProxyListener(helpers))
 
 
 class ProxyListener(IProxyListener):
-
     def __init__(self, helpers):
         self._helpers = helpers
 
     def processProxyMessage(self, messageIsRequest, message):
-        if not messageIsRequest:
+        messageIsResponse = not messageIsRequest
+        if messageIsResponse:
+            print("Intercepting HTTP response")
             messageInfo = message.getMessageInfo()
             rawResponse = messageInfo.getResponse()
             response = self._helpers.analyzeResponse(rawResponse)
@@ -32,12 +32,11 @@ class ProxyListener(IProxyListener):
             msgBody = self._helpers.bytesToString(rawMsgBody)
 
             newBody = self._editAgarHtml(msgBody)
-
             newBodyBytes = self._helpers.stringToBytes(newBody)
 
             newResponse = self._helpers.buildHttpMessage(headers, newBodyBytes)
-
             messageInfo.setResponse(newResponse)
+        
         return
 
     def _editAgarHtml(self, html):
