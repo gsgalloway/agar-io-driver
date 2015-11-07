@@ -43,7 +43,7 @@ not do this unless you explicitly configure it to.
 You can also take a look at `burp/Lib/BurpExtender.py` to see what's injected.
 
 ## Breaking Changes to Agar.io
-The agar.io client code is obfuscated/minified. Getting a hook on the `get_score()` function requires a bit of reverse engineering. Fortunately this is easy -- just grep for "score" in the HTML source and you'll find something like
+The agar.io client code is obfuscated/minified. Getting a hook on the `get_score()` function requires a bit of reverse engineering. Fortunately this is easy -- just grep for "score" in the HTML source or the downloaded JavaScript and you'll find something like
 
 ```
 P=Math.max(P,Db());0!=P&&(null==Ca&&(Ca=new Da(24,"#FFFFFF")),Ca.u(ga("score")+": "+~~(P/100)
