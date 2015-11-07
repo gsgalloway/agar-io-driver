@@ -20,7 +20,7 @@ cd burp
 .\suite.bat
 
 # Mac/linux
-./suite.sh
+bash ./suite.sh
 ```
 
 Then run `agar_io_driver.py` as a standalone python executable or import it into your project.
