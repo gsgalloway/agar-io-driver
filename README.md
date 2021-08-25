@@ -9,7 +9,7 @@ A tool for automating interaction with Agar.io.
 Then `pip install -r requirements.txt`. Ignore the warnings.
 
 ## Use
-The driver uses Burp Suite to inject a few hooks into the agar client code to make automated interaction feasible. A copy of `burp` and its dependencies is included with this project.
+The driver uses Burp Suite to inject a few hooks into the agar client code to make automated interaction feasible. A copy of `burp` and its dependencies is included with this project
 
 First run:
 
